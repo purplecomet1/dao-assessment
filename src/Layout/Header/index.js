@@ -16,13 +16,7 @@ import { useTheme } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
 import MenuIcon from "@mui/icons-material/Menu";
 import { setToLS } from "../../Utils/storage";
-import {
-  RPC,
-  vrtABI,
-  vrtAddress,
-  daoABI,
-  daoAddress,
-} from "../../Constants/config";
+import { RPC, vrtABI, vrtAddress, daoABI, daoAddress } from "../../Constants/config";
 
 const web3 = new Web3(new Web3.providers.HttpProvider(RPC));
 const vrtContract = new web3.eth.Contract(vrtABI, vrtAddress);
@@ -48,6 +42,10 @@ class Header extends React.Component {
   };
 
   async walletConnect() {
+    if (!window.ethereum) {
+      return;
+    }
+
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
@@ -174,11 +172,7 @@ class Header extends React.Component {
             justifyContent: "space-between",
           }}
         >
-          <Stack
-            alignItems="center"
-            flexDirection="row"
-            gap={this.props.matchUpMd ? 6 : 2}
-          >
+          <Stack alignItems="center" flexDirection="row" gap={this.props.matchUpMd ? 6 : 2}>
             <Button
               size="small"
               edge="start"
@@ -256,9 +250,7 @@ class Header extends React.Component {
                           color: this.props.theme.palette.text.primary,
                         }}
                       >
-                        {this.state.account
-                          ? this.state.account.slice(0, 8) + "..."
-                          : ""}
+                        {this.state.account ? this.state.account.slice(0, 8) + "..." : ""}
                       </Typography>
                     </Tooltip>
                   ) : (
@@ -304,14 +296,7 @@ const withHook = (Header) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const matchUpMd = useMediaQuery(theme.breakpoints.up("md"));
-    return (
-      <Header
-        theme={theme}
-        dispatch={dispatch}
-        {...props}
-        matchUpMd={matchUpMd}
-      />
-    );
+    return <Header theme={theme} dispatch={dispatch} {...props} matchUpMd={matchUpMd} />;
   };
 };
 

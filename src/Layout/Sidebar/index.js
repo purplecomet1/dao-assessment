@@ -20,13 +20,7 @@ import HowToVoteOutlinedIcon from "@mui/icons-material/HowToVoteOutlined";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import Web3 from "web3";
-import {
-  RPC,
-  vrtABI,
-  vrtAddress,
-  daoABI,
-  daoAddress,
-} from "../../Constants/config";
+import { RPC, vrtABI, vrtAddress, daoABI, daoAddress } from "../../Constants/config";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import { useDispatch } from "react-redux";
 
@@ -44,6 +38,10 @@ const Menu = (props) => {
   const dispatch = useDispatch();
 
   const walletConnect = async () => {
+    if (!window.ethereum) {
+      return;
+    }
+
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
@@ -297,8 +295,7 @@ export default function Sidebar(props) {
   const theme = useTheme();
   // const matchUpMd = useMediaQuery(theme.breakpoints.up("md"));
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
+  const container = window !== undefined ? () => window().document.body : undefined;
   return (
     <Box
       component="nav"
