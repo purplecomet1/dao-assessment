@@ -94,10 +94,19 @@ const Menu = (props) => {
 
     const { ethereum } = window;
     ethereum.on("accountsChanged", async (accounts) => {
+      if (!accounts || accounts.length === 0) {
+        // Wallet disconnected
+        setAccount("");
+        dispatch({ type: "SET_ACCOUNT", payload: "" });
+        return;
+      }
+
       try {
         accounts = web3.utils.toChecksumAddress(accounts + "");
       } catch (err) {}
       setAccount(accounts);
+      dispatch({ type: "SET_ACCOUNT", payload: accounts });
+      await getPosition(accounts);
     });
 
     ethereum.on("chainChanged", async (chainId) => {

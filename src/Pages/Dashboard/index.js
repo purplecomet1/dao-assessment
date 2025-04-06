@@ -16,13 +16,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useSelector } from "react-redux";
 import Web3 from "web3";
-import {
-  RPC,
-  vrtABI,
-  vrtAddress,
-  daoABI,
-  daoAddress,
-} from "../../Constants/config";
+import { RPC, vrtABI, vrtAddress, daoABI, daoAddress } from "../../Constants/config";
 
 const web3 = new Web3(new Web3.providers.HttpProvider(RPC));
 const vrtContract = new web3.eth.Contract(vrtABI, vrtAddress);
@@ -69,55 +63,63 @@ class Dashboard extends React.Component {
   }
 
   async init(nextProps) {
-    if (nextProps.account) {
-      const owner = await daoContract.methods.owner().call();
-      const totalSupply = await vrtContract.methods.totalSupply().call();
-      const holders = await vrtContract.methods.getHolders().call();
-      const admin = await daoContract.methods.admin().call();
-
+    if (!nextProps.account) {
+      // Reset state when account is empty
       this.setState({
-        owner: owner,
-        totalSupply: totalSupply / 1,
-        holders: holders,
-        realHolderTable: [],
+        totalSupply: 0,
+        holders: [],
         holderTable: [],
-        admin: admin,
-        loading: true,
-      });
-
-      const holderContainer = [];
-
-      for (let i = 0; i < holders.length; i++) {
-        let balanceOfHolder = await vrtContract.methods
-          .balanceOf(holders[i])
-          .call();
-        let tableRow = {
-          id: i + 1,
-          address: holders[i],
-          balance: balanceOfHolder / 1,
-          percentage: ((balanceOfHolder * 100) / totalSupply).toFixed(2),
-        };
-        holderContainer.push(tableRow);
-      }
-
-      this.setState({
-        holderTable: holderContainer,
-        realHolderTable: holderContainer.slice(
-          (this.state.page - 1) * pageStep,
-          this.state.page * pageStep
-        ),
+        realHolderTable: [],
+        owner: "",
+        admin: "",
         loading: false,
+        page: 1,
       });
+      return;
     }
+
+    const owner = await daoContract.methods.owner().call();
+    const totalSupply = await vrtContract.methods.totalSupply().call();
+    const holders = await vrtContract.methods.getHolders().call();
+    const admin = await daoContract.methods.admin().call();
+
+    this.setState({
+      owner: owner,
+      totalSupply: totalSupply / 1,
+      holders: holders,
+      realHolderTable: [],
+      holderTable: [],
+      admin: admin,
+      loading: true,
+    });
+
+    const holderContainer = [];
+
+    for (let i = 0; i < holders.length; i++) {
+      let balanceOfHolder = await vrtContract.methods.balanceOf(holders[i]).call();
+      let tableRow = {
+        id: i + 1,
+        address: holders[i],
+        balance: balanceOfHolder / 1,
+        percentage: ((balanceOfHolder * 100) / totalSupply).toFixed(2),
+      };
+      holderContainer.push(tableRow);
+    }
+
+    this.setState({
+      holderTable: holderContainer,
+      realHolderTable: holderContainer.slice(
+        (this.state.page - 1) * pageStep,
+        this.state.page * pageStep
+      ),
+      loading: false,
+    });
   }
 
   handlePage(event, page) {
     this.setState({
       page: page,
-      realHolderTable: this.state.holderTable.slice(
-        (page - 1) * pageStep,
-        page * pageStep
-      ),
+      realHolderTable: this.state.holderTable.slice((page - 1) * pageStep, page * pageStep),
     });
   }
 
@@ -134,9 +136,7 @@ class Dashboard extends React.Component {
         <Box
           sx={{
             bgcolor:
-              this.props.theme.palette.mode === "dark"
-                ? "rgba(0,0,0,.8)"
-                : "rgba(252,252,252,.3)",
+              this.props.theme.palette.mode === "dark" ? "rgba(0,0,0,.8)" : "rgba(252,252,252,.3)",
           }}
         >
           <Box
@@ -176,9 +176,7 @@ class Dashboard extends React.Component {
                     p: 4,
                     pt: 2,
                     border:
-                      this.props.theme.palette.mode === "dark"
-                        ? "none"
-                        : `0.5px solid #CBCBCB`,
+                      this.props.theme.palette.mode === "dark" ? "none" : `0.5px solid #CBCBCB`,
                     bgcolor:
                       this.props.theme.palette.mode === "dark"
                         ? this.props.theme.palette.background.paper
@@ -189,23 +187,12 @@ class Dashboard extends React.Component {
                         : "0px 0px 10px rgba(0, 0, 0, 0.07)",
                   }}
                 >
-                  <Stack
-                    flexDirection="row"
-                    alignItems="center"
-                    gap={2}
-                    sx={{ pb: 2 }}
-                  >
-                    <Stack
-                      alignItems="center"
-                      justifyContent="center"
-                      sx={{ height: 40 }}
-                    >
+                  <Stack flexDirection="row" alignItems="center" gap={2} sx={{ pb: 2 }}>
+                    <Stack alignItems="center" justifyContent="center" sx={{ height: 40 }}>
                       <Box
                         component="img"
                         src={
-                          this.props.theme.palette.mode === "dark"
-                            ? element.img_dark
-                            : element.img
+                          this.props.theme.palette.mode === "dark" ? element.img_dark : element.img
                         }
                       />
                     </Stack>

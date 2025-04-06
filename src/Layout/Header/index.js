@@ -102,6 +102,15 @@ class Header extends React.Component {
 
     const { ethereum } = window;
     ethereum.on("accountsChanged", async (accounts) => {
+      if (!accounts || accounts.length === 0) {
+        // Wallet disconnected
+        this.setState({
+          account: "",
+        });
+        this.props.dispatch({ type: "SET_ACCOUNT", payload: "" });
+        return;
+      }
+
       try {
         accounts = web3.utils.toChecksumAddress(accounts + "");
       } catch (err) {}
