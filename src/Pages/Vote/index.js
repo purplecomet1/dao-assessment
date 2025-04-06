@@ -15,13 +15,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useSelector } from "react-redux";
 import Web3 from "web3";
-import {
-  RPC,
-  vrtABI,
-  vrtAddress,
-  daoABI,
-  daoAddress,
-} from "../../Constants/config";
+import { RPC, vrtABI, vrtAddress, daoABI, daoAddress } from "../../Constants/config";
 
 const web3 = new Web3(new Web3.providers.HttpProvider(RPC));
 const daoContract = new web3.eth.Contract(daoABI, daoAddress);
@@ -75,9 +69,7 @@ class Vote extends React.Component {
       alert("You are not a Member!");
     }
 
-    const balance = await vrtContract.methods
-      .balanceOf(this.props.account)
-      .call();
+    const balance = await vrtContract.methods.balanceOf(this.props.account).call();
     if (balance === 0) {
       alert("you are not a member of Vegan Rob's DAO");
       return;
@@ -99,10 +91,7 @@ class Vote extends React.Component {
   }
 
   async closeVote(proposalID) {
-    if (
-      this.props.account !== this.state.owner &&
-      this.props.account !== this.state.admin
-    ) {
+    if (this.props.account !== this.state.owner && this.props.account !== this.state.admin) {
       alert("you dont have a permission");
     }
 
@@ -183,9 +172,10 @@ class Vote extends React.Component {
                           >
                             <Box
                               src={
-                                element.source
-                                  ? element.source
-                                  : "/images/election.png"
+                                // element.source links to a pinata URL that is down.
+                                // The fallback, election.png, does not exist in the public/images folder. This explains why
+                                // the image is not displaying.
+                                element.source ? element.source : "/images/election.png"
                               }
                               component="img"
                               sx={{ width: 40 }}
@@ -204,9 +194,7 @@ class Vote extends React.Component {
                               variant="outlined"
                               color="success"
                               size="small"
-                              disabled={
-                                this.props.position === "GUEST" ? true : false
-                              }
+                              disabled={this.props.position === "GUEST" ? true : false}
                               onClick={() => this.vote(element.id / 1, true)}
                               sx={{
                                 color: this.props.theme.palette.text.primary,
@@ -218,9 +206,7 @@ class Vote extends React.Component {
                               variant="outlined"
                               color="error"
                               size="small"
-                              disabled={
-                                this.props.position === "GUEST" ? true : false
-                              }
+                              disabled={this.props.position === "GUEST" ? true : false}
                               onClick={() => this.vote(element.id / 1, false)}
                               sx={{
                                 color: this.props.theme.palette.text.primary,
